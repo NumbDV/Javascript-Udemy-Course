@@ -32,4 +32,4 @@ console.log(x); */
 // 3
 
 /* console.log(alert(+"Infinity")); */
-// Infinity
+// Infinity 
