@@ -93,9 +93,8 @@ window.addEventListener('DOMContentLoaded', function () {
         btnPopupBlock = document.querySelector('.content');
 
     btnPopupBlock.addEventListener('click', function(event) {
-        if (event.target && event.target.className == 'more' || event.target.className == 'description-btn') {
-        
-        overlay.style.display = 'block';
+        if (event.target && event.target.className == 'more' || event.target.className == 'description-btn') {        
+            overlay.style.display = 'block';
             this.classList.add('more-splash');
             document.body.style.overflow = 'hidden';
         }
