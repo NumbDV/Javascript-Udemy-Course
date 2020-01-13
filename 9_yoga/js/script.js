@@ -92,24 +92,129 @@ window.addEventListener('DOMContentLoaded', function () {
         close = document.querySelector('.popup-close'),
         btnPopupBlock = document.querySelector('.content');
 
-    btnPopupBlock.addEventListener('click', function(event) {
-        if (event.target && event.target.className == 'more' || event.target.className == 'description-btn') {        
+    btnPopupBlock.addEventListener('click', function (event) {
+        if (event.target && event.target.className == 'more' || event.target.className == 'description-btn') {
             overlay.style.display = 'block';
             this.classList.add('more-splash');
             document.body.style.overflow = 'hidden';
         }
     });
 
-    
+
     /* more.addEventListener('click', function() {
         overlay.style.display = 'block';
         this.classList.add('more-splash');
         document.body.style.overflow = 'hidden'; //запрещает прокрутку страницы при закрытии мод. окна
     }); */
 
-    close.addEventListener('click', function() {
+    close.addEventListener('click', function () {
         overlay.style.display = 'none';
         this.classList.remove('more-splash');
         document.body.style.overflow = '';
+    });
+
+    // Form
+
+    let message = {
+        loading: 'Загрузка...',
+        success: 'Спасибо! Скоро мы с Вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+
+    let form = document.querySelector('.main-form'),
+        input = form.getElementsByTagName('input'),
+        statusMessage = document.createElement('div');
+
+        statusMessage.classList.add('status');
+
+    form.addEventListener('submit', function (event) { //ОБЯЗАТЕЛЬНО вешаем обработчик на ФОРМУ!
+        event.preventDefault(); // отменяем перезагрузку страницы при нажатии на кнопку
+        form.appendChild(statusMessage); // добавляем новый div status 
+
+        let request = new XMLHttpRequest();
+        request.open('POST', 'server.php'); // настраиваем запрос
+        /* request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // для отправки данных в обычном формате (не JSON) */
+        request.setRequestHeader('Content-Type', 'application/json; charset=utf-8'); // для отправки данных в JSON формате
+
+        let formData = new FormData(form); // внутри лежат данные, которые вввел пользователь
+
+        let obj = {}; // обьект для помещения пользовательских данных
+
+        formData.forEach(function(value, key){ 
+            obj[key] = value;
+        });
+        let json = JSON.stringify(obj); // преобразуем все данные в формат JSON
+
+        /* request.send(formData); */
+        request.send(json);
+
+        request.addEventListener('readystatechange', function () {
+            if (request.readyState < 4) {
+                statusMessage.innerHTML = message.loading;
+            } else if (request.readyState === 4 && request.status == 200) {
+                statusMessage.innerHTML = message.success;
+            } else {
+                statusMessage.innerHTML = message.failure;
+            }
+        });
+
+        for (let i = 0; i < input.length; i++) { // очистка поля ввода после отправки данных
+            input[i].value = '';
+        }
+    });
+
+
+    // Slider
+
+    let slideIndex = 1, // параметр текущего слайда
+        slides = document.querySelectorAll('.slider-item'),
+        prev = document.querySelector('.prev'),
+        next = document.querySelector('.next'),
+        dotsWrap = document.querySelector('.slider-dots'),
+        dots = document.querySelectorAll('.dot');
+
+    showSlides(slideIndex);
+    function showSlides(n) {
+
+        if (n > slides.length) {
+            slideIndex = 1; // пролистывание от последнего к первому
+        }
+        if (n < 1) {
+            slideIndex = slides.length; // пролистывание назад ( от первого к последнему)
+        }
+
+        slides.forEach((item) => item.style.display = 'none'); // скрываем все слайды
+
+
+        /* for (let i = 0; i < slides.length; i++) { // аналог верхней функции
+            slides[i].style.display = 'none';
+        } */
+        dots.forEach((item) => item.classList.remove('dot-active')); // убираем класс активности с точек
+
+        slides[slideIndex - 1].style.display = 'block'; // отображаем 1й слайд
+        dots[slideIndex - 1].classList.add('dot-active'); // и соответственно 1ю точку делаем активной
+    }
+
+    function plusSlides(n) { // будет изменять наш индекс в зависимости от того, в какуб сторону идём
+        showSlides(slideIndex += n); // сразу вызываем функцию показа слайда с новым аргументом
+    }
+    function currentSlide(n) { // определяет текущий слайд и устанавливает его
+        showSlides(slideIndex = n);
+    } 
+
+    prev.addEventListener('click', function() {
+        plusSlides(-1); // листаем назад, -1 - аргумент для уменьшения slideIndex
+    });
+    next.addEventListener('click', function () {
+        plusSlides(1); // листаем вперед
+    });
+
+    dotsWrap.addEventListener('click', function(event) { // используем делегирование
+        for (let i = 0; i < dots.length + 1; i++) { // +1 для того, чтобы цикл сделал на 1 итерацию больше, т.к. точек\слайдов 4, а номер индекса макс. 3
+            if (event.target.classList.contains('dot') && event.target == dots[i-1]) { // [i-1] - при клике на 4ю точку - отображается точка с индексом 3
+                currentSlide(i);
+            }
+        }
     });
 });
