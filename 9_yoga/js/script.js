@@ -217,4 +217,47 @@ window.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // Calc
+
+    let persons = document.querySelectorAll('.counter-block-input')[0],
+        restDays = document.querySelectorAll('.counter-block-input')[1],
+        place = document.getElementById('select'),
+        totalValue = document.getElementById('total'),
+        personsSum = 0,
+        daySum = 0,
+        total = 0;
+
+        totalValue.innerHTML = 0;
+
+        persons.addEventListener('change', function() {
+            personsSum = +this.value; // получаем value у инпута, на котором происходит событие
+            total = (daySum + personsSum)*4000;
+            
+            if (restDays.value == '') { // если не заполнено поле с днями, то общая сумма равна 0
+                totalValue.innerHTML = 0;
+            } else {
+                totalValue.innerHTML = total;
+            }
+        });
+
+        restDays.addEventListener('change', function() {
+            daysSum = +this.value; // получаем value у инпута, на котором происходит событие
+            total = (daySum + personsSum)*4000;
+            
+            if (persons.value == '') { // если не заполнено поле с днями, то общая сумма равна 0
+                totalValue.innerHTML = 0;
+            } else {
+                totalValue.innerHTML = total;
+            }
+        });
+
+        place.addEventListener('change', function() {
+            if (restDays == '' || persons.value == '') {
+                totalValue.innerHTML = 0;
+            } else {
+                let a = total;
+                totalValue.innerHTML = a * this.options[this.selectedIndex].value;
+            }
+        });
 });
